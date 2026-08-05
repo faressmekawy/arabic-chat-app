@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Video Chat & Dating</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
+    <style>
+        /* ================= التنسيقات الأساسية والاستايل للموقع ================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0b0b0b;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        /* الـ Navbar الرئيسي للكمبيوتر والموبايل */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background: #141414;
+            border-bottom: 1px solid #222;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-item {
+            color: #aaa;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            transition: color 0.3s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+
+        .nav-item:hover {
+            color: #fff;
+            background: #1a1a1a;
+        }
+
+        .nav-item.active {
+            color: #a29bfe;
+            background: rgba(108, 92, 231, 0.1);
+        }
+
+        .user-stats {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* الحاويات والصفحات */
+        .main-container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .page-section {
+            animation: fadeIn 0.4s ease;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* استايل كروت المستخدمين المتصلين في الهوم */
+        .online-user-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #1a1a1a;
+            border: 1px solid #262626;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 12px;
+            transition: transform 0.2s, border-color 0.2s;
+            cursor: pointer;
+        }
+
+        .online-user-card:hover {
+            transform: scale(1.01);
+            border-color: #6c5ce7;
+        }
+
+        .user-info-block {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar-styled {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #00b894;
+            background: #242424;
+            flex-shrink: 0;
+        }
+
+        .pulse-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #00b894;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 8px #00b894;
+        }
+
+        .pulse-dot-red {
+            width: 8px;
+            height: 8px;
+            background-color: #ff4757;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 8px #ff4757;
+            animation: redBlink 1.2s infinite;
+        }
+
+        /* استايل كروت صفحة Me والرفع */
+        .card {
+            background: #141414;
+            border: 1px solid #222;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .input-group input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: white;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input[type="text"]:focus {
+            border-color: #6c5ce7;
+        }
+
+        .upload-btn-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            margin-top: 10px;
+            margin-bottom: 25px;
+        }
+
+        .btn-upload {
+            border: 1px dashed #6c5ce7;
+            color: #a29bfe;
+            background-color: rgba(108, 92, 231, 0.05);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-btn-wrapper:hover .btn-upload {
+            background-color: rgba(108, 92, 231, 0.15);
+            border-style: solid;
+        }
+
+        .upload-btn-wrapper input[type=file] {
+            font-size: 100px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .save-btn {
+            background: #6c5ce7;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 15px;
+            width: 100%;
+            transition: background 0.3s;
+        }
+
+        .save-btn:hover {
+            background: #5b4cc4;
+        }
+
+        .rank-pop-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #222;
+            padding: 10px;
+            border-radius: 8px;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+        .rank-pop-card:hover {
+            background: #2a2a2a;
+        }
+
+        /* ================= تنسيقات قسم فيديو شات الاحترافي (العودة للنظام المزدوج المتجاور) ================= */
+        .video-layout-container {
+            position: relative;
+            width: 100%;
+            height: 480px;
+            background: #000;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #222;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .readiness-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(11, 11, 11, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+            gap: 20px;
+        }
+
+        .readiness-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+            letter-spacing: 0.5px;
+        }
+
+        .readiness-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-ready {
+            padding: 12px 35px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-ready.yes {
+            background: linear-gradient(45deg, #6c5ce7, #a29bfe);
+            color: white;
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
+        }
+
+        .btn-ready.yes:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(108, 92, 231, 0.6);
+        }
+
+        .btn-ready.no {
+            background: #222;
+            color: #aaa;
+            border: 1px solid #333;
+        }
+
+        .btn-ready.no:hover {
+            background: #2a2a2a;
+            color: #fff;
+        }
+
+        /* تقسيم شاشات الفيديو جنب بعض بالتساوي مثل الواجهة السابقة المستقرة */
+        .video-streams-grid {
+            position: relative;
+            flex: 1;
+            width: 100%;
+            min-height: 0;
+            display: flex;
+            background: #050505;
+        }
+
+        /* شاشة الغريب */
+        .remote-video-wrap {
+            flex: 1;
+            height: 100%;
+            position: relative;
+            background: #111;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-right: 1px solid #222;
+        }
+
+        .remote-video-element {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* الدائرة المصغرة لصورة الغريب أسفل شاشته المباشرة */
+        .stranger-small-avatar-wrap {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 2px solid #6c5ce7;
+            overflow: hidden;
+            z-index: 35;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            background: #242424;
+            cursor: pointer;
+        }
+        .stranger-small-avatar-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .stranger-rating-box {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            text-align: center;
+            width: 280px;
+            max-width: 90%;
+            box-sizing: border-box;
+            background: rgba(20, 20, 20, 0.6); 
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            padding: 10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .rating-question-text {
+            font-size: 12px;
+            color: #e0e0e0;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .rating-nums-row {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-rate-num {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(108, 92, 231, 0.2);
+            border: 1px solid rgba(108, 92, 231, 0.4);
+            color: #a29bfe;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .btn-rate-num:hover {
+            background: #6c5ce7;
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        .no-likes-msg {
+            font-size: 13px;
+            color: #ff4757;
+            font-weight: bold;
+        }
+
+        .like-feedback-toast {
+            position: fixed;
+            top: 72px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(108, 92, 231, 0.95);
+            color: #fff;
+            padding: 10px 18px;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 3000000;
+            box-shadow: 0 6px 24px rgba(108, 92, 231, 0.45);
+            pointer-events: none;
+            animation: toastIn 0.25s ease;
+        }
+
+        .like-feedback-toast.error {
+            background: rgba(255, 71, 87, 0.95);
+            box-shadow: 0 6px 24px rgba(255, 71, 87, 0.35);
+        }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(-50%) translateY(-8px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        /* شاشتك أنت الموازية والمطابقة تماماً على الجانب الآخر */
+        .local-video-wrap {
+            flex: 1;
+            height: 100%;
+            position: relative;
+            background: #111;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .local-video-element {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+
+        /* شريط أزرار التحكم السفلي للدردشة ثنائي الثبات */
+        .video-controls-bar {
+            position: relative;
+            flex-shrink: 0;
+            width: 100%;
+            height: 70px;
+            background: #141414;
+            border-top: 1px solid #222;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            z-index: 20;
+        }
+
+        .control-action-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            font-size: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .control-action-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.05);
+        }
+
+        .control-action-btn.btn-next {
+            background: #6c5ce7;
+            width: 90px;
+            border-radius: 22px;
+            font-weight: bold;
+            font-size: 14px;
+            gap: 5px;
+            border: none;
+        }
+
+        .control-action-btn.btn-next:hover {
+            background: #5b4cc4;
+        }
+
+        .control-action-btn.btn-exit {
+            background: #ff4757;
+            border: none;
+        }
+
+        .control-action-btn.btn-exit:hover {
+            background: #ff2e44;
+        }
+
+        .control-action-btn.disabled-state {
+            background: rgba(255, 71, 87, 0.2);
+            border-color: #ff4757;
+            color: #ff4757;
+        }
+
+        .rank-pop-card img {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .rank-pop-card img:hover {
+            transform: scale(1.08);
+        }
+
+        #visitorsListContainer img {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        #visitorsListContainer img:hover {
+            transform: scale(1.08);
+        }
+
+        /* ================= نافذة التكبير المنبثقة الفورية والسريعة للغاية ================= */
+        .image-viewer-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000000;
+        }
+        .image-viewer-content {
+            max-width: 85%;
+            max-height: 80%;
+            border-radius: 12px;
+            border: 3px solid #6c5ce7;
+            object-fit: cover;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+        }
+
+        /* ================= استايل التوافق الكامل مع الهواتف الذكية (Responsive UI) ================= */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 12px;
+                padding: 12px;
+            }
+            .nav-links {
+                width: 100%;
+                justify-content: space-around;
+                gap: 5px;
+            }
+            .nav-item {
+                font-size: 13px;
+                padding: 6px 8px;
+                gap: 4px;
+            }
+            .nav-item span {
+                display: none;
+            }
+            .nav-item #nav-views-badge {
+                display: inline-block;
+            }
+            .user-stats {
+                width: 100%;
+                justify-content: space-between;
+                border-top: 1px solid #222;
+                padding-top: 10px;
+            }
+            .main-container {
+                margin: 15px auto;
+                padding: 0 10px;
+            }
+            .video-layout-container {
+                height: 380px;
+            }
+            .video-streams-grid {
+                flex-direction: row;
+            }
+            .stranger-rating-box {
+                max-width: 90%;
+                width: auto;
+                left: 50%;
+                transform: translateX(-50%);
+                top: 8px;
+                padding: 8px;
+            }
+            .btn-rate-num {
+                width: 26px;
+                height: 26px;
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="nav-links">
+            <div class="nav-item active" id="nav-home" onclick="switchPage('home')">
+                <i class="fa-solid fa-house"></i> <span>Home</span>
+            </div>
+            <div class="nav-item" id="nav-ranks" onclick="toggleRanksPopup(event)" style="position: relative; cursor: pointer;">
+                <i class="fa-solid fa-trophy"></i> <span>Ranks</span>
+            </div>
+            <div class="nav-item" id="nav-views" onclick="toggleViewsPopup(event)" style="position: relative; cursor: pointer;">
+                <i class="fa-solid fa-eye"></i>
+                <span>Who Viewed Me</span>
+                <span id="nav-views-badge" class="pulse-dot-red hidden" style="margin-left: 3px;"></span>
+            </div>
+            <div class="nav-item" id="nav-me" onclick="switchPage('me')">
+                <i class="fa-solid fa-user"></i> <span>Me</span>
+            </div>
+        </div>
+
+        <div class="user-stats">
+            <button class="nav-center-btn" onclick="switchPage('video-chat')" style="display: flex; align-items: center; gap: 8px; background: linear-gradient(45deg, #6c5ce7, #a29bfe); color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-weight: bold;">
+                <i class="fa-solid fa-video"></i> Find a Stranger
+            </button>
+            
+            <div class="stat-box hearts" style="display: flex; align-items: center; gap: 5px; color: #fff;">
+                <i class="fa-solid fa-heart" style="color: #ff4757;"></i>
+                <span id="heartCount">0</span>
+            </div>
+            
+            <div class="stat-box cc" style="display: flex; align-items: center; gap: 5px; color: #fff; background: rgba(255, 211, 42, 0.1); padding: 4px 10px; border-radius: 12px; border: 1px solid rgba(255, 211, 42, 0.2);">
+                <i class="fa-solid fa-coins" style="color: #ffd32a;"></i>
+                <span id="coinCount" style="font-weight: bold; color: #ffd32a;">5</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="likeFeedbackToast" class="like-feedback-toast hidden"></div>
+
+    <div id="imageViewerModal" class="image-viewer-modal hidden" onclick="closeImageViewer(event)">
+        <img id="modalTargetImg" class="image-viewer-content" src="" onclick="event.stopPropagation()">
+    </div>
+
+    <div id="cropModal" class="image-viewer-modal hidden" onclick="closeCropModal()">
+        <div style="background:#141414;border:1px solid #333;border-radius:12px;padding:16px;max-width:95vw;max-height:90vh;" onclick="event.stopPropagation()">
+            <h3 style="margin-bottom:12px;font-size:16px;">Crop your profile photo</h3>
+            <div style="max-height:60vh;overflow:hidden;background:#000;">
+                <img id="cropTargetImage" src="" alt="Crop" style="max-width:100%;display:block;">
+            </div>
+            <div style="display:flex;gap:10px;margin-top:14px;justify-content:flex-end;">
+                <button type="button" class="btn-ready no" onclick="closeCropModal()">Cancel</button>
+                <button type="button" class="btn-ready yes" onclick="applyCrop()">Save crop</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+
+        <div id="page-home" class="page-section">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                <h2 style="font-size: 20px; font-weight: bold; display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-circle" style="color: #00b894; font-size: 12px; animation: blink 1.5s infinite;"></i>
+                    Active Users Online
+                </h2>
+                <span style="background: #1a1a1a; padding: 4px 10px; border-radius: 12px; font-size: 12px; color: #aaa; border: 1px solid #333;" id="online-count">0 Online</span>
+            </div>
+            
+            <div id="onlineUsersList" style="display: flex; flex-direction: column; gap: 5px;"></div>
+        </div>
+
+        <div id="page-me" class="page-section hidden">
+            <div class="card" style="text-align: center;">
+                <h3 style="margin-bottom: 10px; text-align: left;">Set Up Your Profile</h3>
+                <p style="color: #666; font-size: 13px; text-align: left; margin-bottom: 20px;">Upload a real profile picture to stand out and attract likes.</p>
+                
+                <div style="position: relative; display: inline-block; margin-bottom: 10px;">
+                    <img id="myAvatar" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Faris" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #6c5ce7; background: #242424;">
+                </div>
+
+                <div>
+                    <div class="upload-btn-wrapper">
+                        <button class="btn-upload"><i class="fa-solid fa-camera"></i> Upload Profile Picture</button>
+                        <input type="file" id="imageUploaderInput" accept="image/*" onchange="previewAndProcessImage(this)">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="usernameInput">Your Display Name</label>
+                    <input type="text" id="usernameInput" placeholder="Type your name here...">
+                </div>
+
+                <button class="save-btn" onclick="saveProfileData()">Save & Go Online</button>
+            </div>
+        </div>
+
+        <div id="page-video-chat" class="page-section hidden">
+            <div class="video-layout-container">
+                
+                <div id="readinessOverlay" class="readiness-overlay">
+                    <div class="readiness-title">Are you ready?</div>
+                    <p style="color:#888; font-size:14px; max-width:320px; text-align:center;">Click Yes to join the match queue and connect with another online user via video chat.</p>
+                    <div class="readiness-buttons">
+                        <button class="btn-ready yes" onclick="handleReadyResponse(true)">Yes</button>
+                        <button class="btn-ready no" onclick="handleReadyResponse(false)">No</button>
+                    </div>
+                </div>
+
+                <div class="video-streams-grid">
+
+                    <div id="strangerRatingBox" class="stranger-rating-box hidden">
+                        <div id="ratingQuestionText" class="rating-question-text">How many likes does this person deserve?</div>
+                        <div id="ratingButtonsContainer" class="rating-nums-row"></div>
+                    </div>
+                    
+                    <div class="remote-video-wrap">
+                        <div id="searchingStateLoader" style="text-align: center; position: absolute; z-index: 5;">
+                            <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 40px; color: #6c5ce7; margin-bottom: 15px;"></i>
+                            <p style="color: #aaa; font-size: 14px;">Searching for a stranger match around the globe...</p>
+                        </div>
+
+                        <div id="strangerSmallAvatarBox" class="stranger-small-avatar-wrap hidden" onclick="triggerStrangerPhotoView(event)">
+                            <img id="strangerSmallAvatarImg" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Sasha">
+                        </div>
+
+                        <video id="remoteVideo" class="remote-video-element" autoplay playsinline webkit-playsinline></video>
+                    </div>
+
+                    <div class="local-video-wrap">
+                        <video id="localVideo" class="local-video-element" autoplay playsinline webkit-playsinline muted></video>
+                    </div>
+                </div>
+
+                <div class="video-controls-bar">
+                    <button id="toggleMicBtn" class="control-action-btn" onclick="toggleMic()">
+                        <i class="fa-solid fa-microphone"></i>
+                    </button>
+                    
+                    <button id="toggleCamBtn" class="control-action-btn" onclick="toggleCamera()">
+                        <i class="fa-solid fa-video"></i>
+                    </button>
+
+                    <button class="control-action-btn btn-next" onclick="triggerNextStrangerMatch()">
+                        Next <i class="fa-solid fa-forward"></i>
+                    </button>
+
+                    <button class="control-action-btn btn-exit" onclick="exitVideoChatFlow()" title="Exit Chat">
+                        <i class="fa-solid fa-phone-slash"></i>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div id="ranksPopup" style="display: none; position: fixed; top: 60px; left: 60px; width: 330px; background: #1a1a1a; border: 1px solid #333; border-radius: 10px; box-shadow: 0 12px 32px rgba(0,0,0,0.7); z-index: 999999;" onclick="event.stopPropagation()">
+        <div style="padding: 15px; border-bottom: 1px solid #262626; display: flex; justify-content: space-between; align-items: center;">
+            <span style="color: #fff; font-weight: bold; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-trophy" style="color: #ffd32a;"></i> Top Popular Stars
+            </span>
+            <span style="color: #666; font-size: 11px;">Weekly Ranks</span>
+        </div>
+        <div style="padding: 10px; display: flex; flex-direction: column; gap: 10px;" id="ranksListContainer"></div>
+    </div>
+
+    <div id="viewsPopup" style="display: none; position: fixed; top: 60px; left: 160px; width: 330px; background: #1a1a1a; border: 1px solid #333; border-radius: 10px; box-shadow: 0 12px 32px rgba(0,0,0,0.7); z-index: 999999;" onclick="event.stopPropagation()">
+        <div style="padding: 15px; border-bottom: 1px solid #262626; display: flex; justify-content: space-between; align-items: center;">
+            <span style="color: #fff; font-weight: bold; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-eye" style="color: #a29bfe;"></i> Profile Visitors
+            </span>
+            <span onclick="clearViewsBadge()" style="color: #666; font-size: 11px; cursor: pointer;">Clear Badge</span>
+        </div>
+        <div style="max-height: 320px; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 10px;" id="visitorsListContainer"></div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+    <script src="/app.js"></script>
+    <style>
+        @keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+        @keyframes redBlink { 0%, 100% { opacity: 0.4; transform: scale(1); } 50% { opacity: 1; transform: scale(1.2); } }
+    </style>
+</body>
+</html>
