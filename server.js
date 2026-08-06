@@ -132,6 +132,10 @@ function saveDatabase() {
     fs.writeFileSync(DATABASE_FILE, JSON.stringify({ users }, null, 2), 'utf8');
 }
 
+function scheduleSaveProfiles() {
+    saveDatabase();
+}
+
 function ensureDailyCoins(profile) {
     const now = Date.now();
     if (!profile.lastCoinDailyClaim || now - profile.lastCoinDailyClaim >= COIN_RESET_MS) {
@@ -519,7 +523,7 @@ io.on('connection', (socket) => {
     });
 });
 
-loadProfilesFromDisk();
+loadDatabase();
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
