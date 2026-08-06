@@ -524,7 +524,9 @@ io.on('connection', (socket) => {
 });
 
 loadDatabase();
-
+app.get('/sitemap.xml', (req, res) => {
+    res.sendFile(__dirname + '/sitemap.xml');
+});
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
