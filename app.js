@@ -1063,4 +1063,22 @@
     window.triggerNextStrangerMatch = triggerNextStrangerMatch;
     window.exitVideoChatFlow = exitVideoChatFlow;
     window.triggerStrangerPhotoView = triggerStrangerPhotoView;
+    // Check and Handle First-Time Visitor Rules Modal
+document.addEventListener('DOMContentLoaded', () => {
+  const modal = document.getElementById('rulesModal');
+  const acceptBtn = document.getElementById('acceptRulesBtn');
+
+  const hasAcceptedRules = localStorage.getItem('hasAcceptedRules');
+
+  if (!hasAcceptedRules && modal) {
+    modal.style.display = 'flex';
+  }
+
+  if (acceptBtn && modal) {
+    acceptBtn.addEventListener('click', () => {
+      localStorage.setItem('hasAcceptedRules', 'true');
+      modal.style.display = 'none';
+    });
+  }
+});
 })();

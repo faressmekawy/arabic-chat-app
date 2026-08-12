@@ -810,5 +810,106 @@
         @keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
         @keyframes redBlink { 0%, 100% { opacity: 0.4; transform: scale(1); } 50% { opacity: 1; transform: scale(1.2); } }
     </style>
+   <!-- Terms & Rules Modal -->
+<div id="rulesModal" class="rules-modal-overlay">
+  <div class="rules-modal-card">
+    <h2>Community Rules & Terms</h2>
+    <div class="rules-content">
+      <p>Welcome to our platform! Please review and agree to the following guidelines before continuing:</p>
+      <ul>
+        <li>❌ Explicit content or exposing sensitive body parts during video calls is strictly prohibited.</li>
+        <li>❌ Offensive language, verbal abuse, or inappropriate behavior will not be tolerated.</li>
+        <li>⚡ Any user violating these rules will be <strong>permanently banned immediately</strong>.</li>
+      </ul>
+    </div>
+    <button id="acceptRulesBtn" class="rules-accept-btn">
+      I Understand &amp; I am 18+
+    </button>
+  </div>
+</div>
+
+<style>
+/* Modal Overlay Styling */
+.rules-modal-overlay {
+  display: none; /* hidden by default */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(5px);
+  z-index: 99999;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+  direction: ltr; /* English text alignment */
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Modal Card Styling */
+.rules-modal-card {
+  background: #1e1e2f;
+  color: #ffffff;
+  max-width: 480px;
+  width: 100%;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: left;
+}
+
+.rules-modal-card h2 {
+  margin-top: 0;
+  font-size: 22px;
+  color: #ff4757;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 12px;
+}
+
+.rules-content p {
+  color: #dcdde1;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.rules-content ul {
+  list-style: none;
+  padding: 0;
+  margin: 18px 0;
+}
+
+.rules-content li {
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 10px 14px;
+  border-radius: 8px;
+  color: #f1f2f6;
+}
+
+/* Button Styling */
+.rules-accept-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #ff4757, #ff6b81);
+  color: #fff;
+  border: none;
+  padding: 14px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+  margin-top: 10px;
+}
+
+.rules-accept-btn:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #ff6b81, #ff4757);
+}
+</style> 
 </body>
 </html>
