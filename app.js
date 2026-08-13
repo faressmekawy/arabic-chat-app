@@ -520,8 +520,8 @@
             if (typeof data.remainingCoins === 'number') {
                 syncCoinsToUI(data.remainingCoins);
             }
-            if (currentStrangerData && typeof data.peerLikes === 'number') {
-                currentStrangerData.likes = data.peerLikes;
+            if (typeof data.peerLikes === 'number') {
+                updateStrangerLikesCount(data.peerLikes, true);
             }
             showLikeFeedback(`Sent ${data.amount} likes!`);
             showAndRenderRatingBox();
@@ -638,10 +638,26 @@
         document.getElementById('strangerSmallAvatarBox')?.classList.add('hidden');
     }
 
+    function updateStrangerLikesCount(likes, animate) {
+        const countEl = document.getElementById('strangerLikesCount');
+        const badgeEl = document.getElementById('strangerLikesBadge');
+        const nextLikes = typeof likes === 'number' ? likes : 0;
+
+        if (countEl) countEl.textContent = String(nextLikes);
+        if (currentStrangerData) currentStrangerData.likes = nextLikes;
+
+        if (animate && badgeEl) {
+            badgeEl.classList.remove('likes-pop');
+            void badgeEl.offsetWidth;
+            badgeEl.classList.add('likes-pop');
+        }
+    }
+
     function updateStrangerUI(peerData) {
         if (!peerData) return;
         const avatarImg = document.getElementById('strangerSmallAvatarImg');
         if (avatarImg && peerData.avatar) avatarImg.src = peerData.avatar;
+        updateStrangerLikesCount(peerData.likes || 0, false);
         document.getElementById('strangerSmallAvatarBox')?.classList.remove('hidden');
         showAndRenderRatingBox();
     }

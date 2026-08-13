@@ -350,25 +350,71 @@
             object-fit: cover;
         }
 
-        /* الدائرة المصغرة لصورة الغريب أسفل شاشته المباشرة */
-        .stranger-small-avatar-wrap {
+        /* لوحة صورة الغريب المصغرة + عداد الإعجابات */
+        .stranger-avatar-panel {
             position: absolute;
-            bottom: 15px;
-            right: 15px;
-            width: 45px;
-            height: 45px;
+            bottom: 12px;
+            right: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            z-index: 35;
+        }
+
+        .stranger-small-avatar-wrap {
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             border: 2px solid #6c5ce7;
             overflow: hidden;
-            z-index: 35;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
             background: #242424;
             cursor: pointer;
+            transition: transform 0.2s ease;
         }
+
+        .stranger-small-avatar-wrap:active {
+            transform: scale(0.95);
+        }
+
         .stranger-small-avatar-wrap img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+        }
+
+        .stranger-likes-badge {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(20, 20, 20, 0.72);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 71, 87, 0.35);
+            border-radius: 14px;
+            padding: 3px 8px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .stranger-likes-badge i {
+            color: #ff4757;
+            font-size: 10px;
+        }
+
+        .stranger-likes-badge.likes-pop {
+            animation: likesPop 0.35s ease;
+        }
+
+        @keyframes likesPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.12); }
+            100% { transform: scale(1); }
         }
 
         .stranger-rating-box {
@@ -623,12 +669,44 @@
                 left: 50%;
                 transform: translateX(-50%);
                 top: 8px;
-                padding: 8px;
+                padding: 7px 8px;
+                background: rgba(15, 15, 15, 0.12);
+                backdrop-filter: blur(6px);
+                -webkit-backdrop-filter: blur(6px);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
             }
+
+            .rating-question-text {
+                color: rgba(255, 255, 255, 0.88);
+                font-size: 11px;
+                margin-bottom: 6px;
+            }
+
             .btn-rate-num {
                 width: 26px;
                 height: 26px;
                 font-size: 11px;
+                background: rgba(108, 92, 231, 0.12);
+                border-color: rgba(108, 92, 231, 0.28);
+            }
+
+            .stranger-avatar-panel {
+                bottom: 8px;
+                right: 8px;
+                gap: 5px;
+            }
+
+            .stranger-small-avatar-wrap {
+                width: 28px;
+                height: 28px;
+                border-width: 1.5px;
+            }
+
+            .stranger-likes-badge {
+                font-size: 10px;
+                padding: 2px 7px;
+                border-radius: 12px;
             }
         }
     </style>
@@ -753,8 +831,14 @@
                             <p style="color: #aaa; font-size: 14px;">Searching for a stranger match around the globe...</p>
                         </div>
 
-                        <div id="strangerSmallAvatarBox" class="stranger-small-avatar-wrap hidden" onclick="triggerStrangerPhotoView(event)">
-                            <img id="strangerSmallAvatarImg" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Sasha">
+                        <div id="strangerSmallAvatarBox" class="stranger-avatar-panel hidden">
+                            <div class="stranger-small-avatar-wrap" onclick="triggerStrangerPhotoView(event)">
+                                <img id="strangerSmallAvatarImg" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Sasha" alt="">
+                            </div>
+                            <div id="strangerLikesBadge" class="stranger-likes-badge">
+                                <i class="fa-solid fa-heart"></i>
+                                <span id="strangerLikesCount">0</span>
+                            </div>
                         </div>
 
                         <video id="remoteVideo" class="remote-video-element" autoplay playsinline webkit-playsinline></video>
